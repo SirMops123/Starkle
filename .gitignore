@@ -1,3 +1,13 @@
+
 node_modules/
+**/node_modules/
+
 .angular/
+**/.angular/
 dist/
+**/dist/
+
+.idea/
+
+*.log
+npm-debug.log*
