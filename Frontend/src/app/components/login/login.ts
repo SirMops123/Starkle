@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {SocketService} from '../../services/socket.service';
 import {Router} from '@angular/router';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,9 @@ import {Router} from '@angular/router';
 export class LoginComponent implements OnInit {
   username: string = '';
 
-  constructor(private socketService: SocketService, private router: Router) {
+  constructor(private socketService: SocketService,
+              private router: Router,
+              private userService: UserService,) {
   }
 
   ngOnInit(): void {
@@ -29,6 +32,9 @@ export class LoginComponent implements OnInit {
     const cleanName = this.username.trim();
     if (cleanName.length >= 3) {
       this.socketService.login(cleanName)
+
+      this.userService.username = this.username;
+      this.userService.credits =
     }
   }
 

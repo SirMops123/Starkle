@@ -1,1 +1,77 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+
+  <!-- Top Navigation -->
+  <header class="dash-header">
+    <div class="header-brand">
+      <span class="brand-logo">🎲</span>
+      <h1 class="brand-text">Starkle <span class="badge-beta">Beta</span></h1>
+    </div>
+
+    <div class="header-user">
+      <div class="credits-display">
+        <span class="credits-icon">🪙</span>
+        <span class="credits-amount">{{ credits }} Credits</span>
+      </div>
+      <div class="user-avatar">
+        <span class="avatar-letter">{{ username.substring(0, 1).toUpperCase() }}</span>
+        <span class="avatar-name">{{ username }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="dash-content">
+
+    <!-- Left Column: Actions & Quick Stats -->
+    <section class="sidebar-actions">
+      <div class="action-card">
+        <h2 class="card-title">Spiel starten</h2>
+        <p class="card-desc">Erstelle eine neue Lobby und lade deine Freunde ein.</p>
+        <button (click)="createLobby()" class="btn-create">
+          + Neue Lobby erstellen
+        </button>
+      </div>
+
+      <div class="streak-card">
+        <div class="streak-icon">🔥</div>
+        <div>
+          <h3 class="streak-title">Tägliche Belohnung</h3>
+          <p class="streak-desc">Dein Streak steht bei 4 Tagen. Morgen gibt es Bonus-Credits!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Lobby List -->
+    <section class="lobby-section">
+      <div class="section-header">
+        <h2 class="section-title">Aktive Lobbies</h2>
+        <span class="lobby-count">{{ lobbies.length }} verfügbar</span>
+      </div>
+
+      <div class="lobby-grid">
+        <!-- Loop durch die Lobbies -->
+        @for (lobby of lobbies; track $index){
+          <div class="lobby-info">
+            <span class="lobby-status-dot" [class.active]="lobby.players < lobby.maxPlayers"></span>
+            <div>
+              <h3 class="lobby-name">{{ lobby.name }}</h3>
+              <p class="lobby-host">Host: {{ lobby.host }}</p>
+            </div>
+          </div>
+
+          <div class="lobby-meta">
+            <span class="player-count">👥 {{ lobby.players }}/{{ lobby.maxPlayers }}</span>
+            <button
+              [disabled]="lobby.players >= lobby.maxPlayers"
+              (click)="joinLobby(lobby.id)"
+              class="btn-join"
+            >
+              Beitreten
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+
+  </main>
+</div>

@@ -1,0 +1,153 @@
+@tailwind utilities;
+
+.dashboard-container {
+  @apply min-h-screen bg-slate-950 text-white font-sans;
+}
+
+/* Header Styles */
+.dash-header {
+  @apply flex items-center justify-between px-6 py-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-50;
+}
+
+.header-brand {
+  @apply flex items-center space-x-3;
+}
+
+.brand-logo {
+  @apply text-2xl;
+}
+
+.brand-text {
+  @apply text-xl font-bold tracking-tight text-white flex items-center gap-2;
+}
+
+.badge-beta {
+  @apply text-xs bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-md border border-indigo-500/20 font-medium;
+}
+
+.header-user {
+  @apply flex items-center space-x-6;
+}
+
+.credits-display {
+  @apply flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800;
+}
+
+.credits-icon {
+  @apply text-lg;
+}
+
+.credits-amount {
+  @apply text-sm font-semibold text-amber-400;
+}
+
+.user-avatar {
+  @apply flex items-center space-x-2.5;
+}
+
+.avatar-letter {
+  @apply w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center font-bold text-sm shadow-md shadow-indigo-600/20;
+}
+
+.avatar-name {
+  @apply text-sm font-medium text-slate-200;
+}
+
+/* Layout Content */
+.dash-content {
+  @apply max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6;
+}
+
+.sidebar-actions {
+  @apply md:col-span-1 space-y-6;
+}
+
+.lobby-section {
+  @apply md:col-span-2;
+}
+
+/* Cards & Widgets */
+.action-card {
+  @apply bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl;
+}
+
+.card-title {
+  @apply text-lg font-bold mb-1 text-white;
+}
+
+.card-desc {
+  @apply text-slate-400 text-sm mb-5 leading-relaxed;
+}
+
+.btn-create {
+  @apply w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/10 cursor-pointer text-center;
+}
+
+.streak-card {
+  @apply bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center space-x-4 shadow-xl;
+}
+
+.streak-icon {
+  @apply text-3xl p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl;
+}
+
+.streak-title {
+  @apply text-sm font-bold text-slate-200;
+}
+
+.streak-desc {
+  @apply text-xs text-slate-400 mt-0.5 leading-relaxed;
+}
+
+/* Lobby Section & Cards */
+.section-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.section-title {
+  @apply text-lg font-bold tracking-tight;
+}
+
+.lobby-count {
+  @apply text-xs text-slate-500 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800;
+}
+
+.lobby-grid {
+  @apply space-y-3;
+}
+
+.lobby-card {
+  @apply bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-all shadow-md;
+}
+
+.lobby-info {
+  @apply flex items-center space-x-3;
+}
+
+.lobby-status-dot {
+  @apply w-2.5 h-2.5 rounded-full bg-slate-700;
+}
+
+.lobby-status-dot.active {
+  @apply bg-emerald-500 animate-pulse;
+}
+
+.lobby-name {
+  @apply font-bold text-slate-100 text-base;
+}
+
+.lobby-host {
+  @apply text-xs text-slate-500 mt-0.5;
+}
+
+.lobby-meta {
+  @apply flex items-center justify-between sm:justify-end space-x-6;
+}
+
+.player-count {
+  @apply text-sm font-medium text-slate-400;
+}
+
+.btn-join {
+  @apply px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-950 disabled:text-slate-700 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-all cursor-pointer;
+}
