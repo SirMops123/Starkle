@@ -1,47 +1,57 @@
 import {Injectable} from '@angular/core';
 import {io, Socket} from 'socket.io-client';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
+import {UserService} from './user.service';
+import {environment} from '../environments/environment';
+import {LobbyService, LobbySummary} from './lobby.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+
+interface LoginSuccessPayload {
+  username: string;
+  credits: number;
+  bonusGiven: boolean;
+}
+
+@Injectable({providedIn: 'root'})
 export class SocketService {
   private socket: Socket;
 
-  private currentUserSubject = new BehaviorSubject<any>(null);
-  currentUser$ = this.currentUserSubject.asObservable();
+  private errorSubject = new Subject<string>();
+  error$: Observable<string> = this.errorSubject.asObservable();
 
-  private leaderboardSubject = new BehaviorSubject<any>(null);
-  currentLeaderboard$ = this.leaderboardSubject.asObservable();
-
-  private lobbySubject = new BehaviorSubject<any>(null);
-  currentLobby$ = this.lobbySubject.asObservable();
-
-  constructor() {
-    this.socket = io('http://localhost:3000');
-
-    this.initListeners();
+  constructor(private userService: UserService,private lobbyService: LobbyService) {
+    this.socket = io(environment.socketUrl);
+    this.registerListeners();
   }
 
-  private initListeners(): void {
-
-    this.socket.on('loginSuccess', (userData) => {
-      this.currentUserSubject.next(userData);
-
-      this.requestLeaderboard();
+  private registerListeners(): void {
+    this.socket.on('connect', () => {
+      console.log('Socket connected:', this.socket.id);
     });
 
-    this.socket.on('leaderboardUpdate', (topTen: any[]) => {
-      this.leaderboardSubject.next(topTen);
+    this.socket.on('disconnect', () => {
+      console.log('Socket disconnected');
     });
 
-    this.socket.on('roomUpdate', (lobbyData) => {
-      this.lobbySubject.next(lobbyData);
+    this.socket.on('loginSuccess', (data: LoginSuccessPayload) => {
+      sessionStorage.setItem('username', data.username);
+      this.userService.setUser({
+        username: data.username,
+        credits: data.credits
+      });
     });
 
-    this.socket.on('error', (errorMessage: string) => {
-      //todo: better error handling
-      alert(errorMessage);
+    this.socket.on('error', (message: string) => {
+      console.error('Socket-Error:', message);
+      this.errorSubject.next(message);
+    });
+
+    this.socket.on('leaderboardUpdate', (leaderboard: { username: string; credits: number }[]) => {
+      this.userService.setLeaderboard(leaderboard);
+    });
+
+    this.socket.on('lobbiesUpdate', (lobbies: LobbySummary[]) => {
+      this.lobbyService.setLobbies(lobbies);
     });
   }
 
@@ -49,8 +59,17 @@ export class SocketService {
     this.socket.emit('login', username);
   }
 
+  logout(): void {
+    sessionStorage.removeItem('username');
+    this.userService.logout();
+  }
+
   requestLeaderboard(): void {
     this.socket.emit('requestLeaderboard');
+  }
+
+  requestLobbies(): void {
+    this.socket.emit('requestLobbies');
   }
 
   createLobby(maxPlayers: number, betAmount: number): void {
@@ -59,10 +78,5 @@ export class SocketService {
 
   joinLobby(roomId: string): void {
     this.socket.emit('joinLobby', roomId);
-  }
-
-  leaveLobby(roomId: string): void {
-    this.socket.emit('leaveLobby', roomId);
-    this.lobbySubject.next(null);
   }
 }

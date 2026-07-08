@@ -49,7 +49,25 @@ function getPayoutPercentages(playerCount: number): number[] {
     }
 }
 
+function getLobbySummaries(games: Record<string, Game>) {
+    return Object.values(games)
+        .filter(g => g.status === 'waiting')
+        .map(g => ({
+            id: g.id,
+            host: g.playerNames[0],
+            players: g.players.length,
+            maxPlayers: g.maxPlayers,
+            betAmount: g.betAmount,
+            status: g.status
+        }));
+}
+
 export default (io: Server, socket: Socket, activeGames: Record<string, Game>) => {
+
+    socket.on('requestLobbies', () => {
+        socket.emit('lobbiesUpdate', getLobbySummaries(activeGames));
+    })
+
     socket.on('createLobby', async ({maxPlayers, betAmount}: { maxPlayers: number, betAmount: number }) => {
 
         if (maxPlayers < 2 || maxPlayers > 8) {
@@ -103,6 +121,7 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
             socket.join(roomId);
             socket.emit('lobbyCreated', roomId);
             io.to(roomId).emit('roomUpdate', activeGames[roomId]);
+            io.emit('lobbiesUpdate', getLobbySummaries(activeGames));
         } catch (err) {
             console.log(err)
             socket.emit('error', 'Failed to create Lobby!')
@@ -141,6 +160,7 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
             }
 
             io.to(roomId).emit('roomUpdate', game);
+            io.emit('lobbiesUpdate', getLobbySummaries(activeGames));
         }catch(err){
             console.log(err);
             socket.emit('error', 'Failed to join Lobby!')
@@ -170,6 +190,7 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
                 } else {
                     io.to(roomId).emit('roomUpdate', game);
                 }
+                io.emit('lobbiesUpdate', getLobbySummaries(activeGames));
 
                 const updatedUser = await userRepository.findByUsername(username);
                 if (updatedUser) {
@@ -208,6 +229,7 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
                     }
                 }
             }
+            io.emit('lobbiesUpdate', getLobbySummaries(activeGames));
         }
     });
 

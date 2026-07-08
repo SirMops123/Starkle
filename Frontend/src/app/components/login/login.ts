@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {SocketService} from '../../services/socket.service';
 import {Router} from '@angular/router';
 import {UserService} from '../../services/user.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -12,8 +13,11 @@ import {UserService} from '../../services/user.service';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   username: string = '';
+  errorMessage:string = '';
+
+  private subs = new Subscription();
 
   constructor(private socketService: SocketService,
               private router: Router,
@@ -21,21 +25,32 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.socketService.currentUser$.subscribe(user => {
-      if (user) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
+    this.subs.add(
+      this.userService.currentUser$.subscribe(user => {
+        if(user) {
+          this.router.navigate(['/dashboard']);
+        }
+      })
+    );
+    this.subs.add(
+      this.socketService.error$.subscribe(message => {
+        this.errorMessage = message;
+      })
+    )
+  }
+
+  ngOnDestroy(): void  {
+    this.subs.unsubscribe();
   }
 
   onSubmit(): void {
     const cleanName = this.username.trim();
-    if (cleanName.length >= 3) {
-      this.socketService.login(cleanName)
-
-      this.userService.username = this.username;
-      this.userService.credits =
+    if (cleanName.length < 3) {
+      this.errorMessage = 'a valid username has 3 or more chars';
+      return;
     }
+    this.errorMessage = '';
+    this.socketService.login(cleanName)
   }
 
 }

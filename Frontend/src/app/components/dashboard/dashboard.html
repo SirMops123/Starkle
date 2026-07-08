@@ -27,9 +27,45 @@
       <div class="action-card">
         <h2 class="card-title">Spiel starten</h2>
         <p class="card-desc">Erstelle eine neue Lobby und lade deine Freunde ein.</p>
-        <button (click)="createLobby()" class="btn-create">
-          + Neue Lobby erstellen
+        <button (click)="openCreateLobbyModal()" class="btn-create">
+          Neue Lobby erstellen
         </button>
+
+        @if (showCreateLobbyModal) {
+          <div class="modal-overlay" (click)="closeCreateLobbyModal()">
+            <div class="modal" (click)="$event.stopPropagation()">
+              <h2>Neue Lobby erstellen</h2>
+
+              <label for="maxPlayers">Spieleranzahl (2–8)</label>
+              <input
+                id="maxPlayers"
+                type="number"
+                [(ngModel)]="newLobbyMaxPlayers"
+                min="2"
+                max="8"
+                step="1"
+              />
+
+              <label for="betAmount">Einsatz (Credits)</label>
+              <input
+                id="betAmount"
+                type="number"
+                [(ngModel)]="newLobbyBetAmount"
+                min="0"
+                step="10"
+              />
+
+              @if (createLobbyError) {
+                <p class="error">{{ createLobbyError }}</p>
+              }
+
+              <div class="modal-actions">
+                <button (click)="closeCreateLobbyModal()" class="btn-cancel">Abbrechen</button>
+                <button (click)="confirmCreateLobby()" class="btn-confirm">Erstellen</button>
+              </div>
+            </div>
+          </div>
+        }
       </div>
 
       <div class="streak-card">
@@ -49,26 +85,29 @@
       </div>
 
       <div class="lobby-grid">
-        <!-- Loop durch die Lobbies -->
-        @for (lobby of lobbies; track $index){
-          <div class="lobby-info">
-            <span class="lobby-status-dot" [class.active]="lobby.players < lobby.maxPlayers"></span>
-            <div>
-              <h3 class="lobby-name">{{ lobby.name }}</h3>
-              <p class="lobby-host">Host: {{ lobby.host }}</p>
+        @for (lobby of lobbies; track lobby.id) {
+          <div class="lobby-card">
+            <div class="lobby-info">
+              <span class="lobby-status-dot" [class.active]="lobby.players < lobby.maxPlayers"></span>
+              <div>
+                <h3>Lobby von {{ lobby.host }}</h3>
+                <p>Einsatz: {{ lobby.betAmount }} Credits</p>
+              </div>
+            </div>
+
+            <div class="lobby-meta">
+              <span class="player-count">👥 {{ lobby.players }}/{{ lobby.maxPlayers }}</span>
+              <button
+                [disabled]="lobby.players >= lobby.maxPlayers"
+                (click)="joinLobby(lobby.id)"
+                class="btn-join"
+              >
+                Beitreten
+              </button>
             </div>
           </div>
-
-          <div class="lobby-meta">
-            <span class="player-count">👥 {{ lobby.players }}/{{ lobby.maxPlayers }}</span>
-            <button
-              [disabled]="lobby.players >= lobby.maxPlayers"
-              (click)="joinLobby(lobby.id)"
-              class="btn-join"
-            >
-              Beitreten
-            </button>
-          </div>
+        } @empty {
+          <p class="no-lobbies">Aktuell keine offenen Lobbies. Erstelle die erste!</p>
         }
       </div>
     </section>
