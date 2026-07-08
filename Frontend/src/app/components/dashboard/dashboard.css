@@ -192,3 +192,24 @@
 .error {
   @apply text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2;
 }
+
+.own-lobby-tag {
+  @apply px-3 py-1.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold rounded-lg;
+}
+
+.toast-error {
+  @apply fixed top-5 left-1/2 -translate-x-1/2 z-[2000] flex items-center gap-2 bg-red-500/15 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl shadow-xl cursor-pointer max-w-md text-sm font-medium animate-toast-in;
+}
+
+.toast-icon {
+  @apply text-base;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.2s ease-out;
+}

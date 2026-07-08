@@ -12,6 +12,10 @@ interface LoginSuccessPayload {
   bonusGiven: boolean;
 }
 
+interface CreditsUpdatePayload {
+  credits: number;
+}
+
 @Injectable({providedIn: 'root'})
 export class SocketService {
   private socket: Socket;
@@ -19,7 +23,9 @@ export class SocketService {
   private errorSubject = new Subject<string>();
   error$: Observable<string> = this.errorSubject.asObservable();
 
-  constructor(private userService: UserService,private lobbyService: LobbyService) {
+  constructor(private userService: UserService,
+              private lobbyService: LobbyService,
+              private router: Router) {
     this.socket = io(environment.socketUrl);
     this.registerListeners();
   }
@@ -40,6 +46,20 @@ export class SocketService {
         credits: data.credits
       });
     });
+
+    this.socket.on('creditsUpdate', (data: CreditsUpdatePayload) => {
+      this.userService.updateCredits(data.credits);
+    });
+
+    this.socket.on('lobbyCreated',(roomId: string) => {
+      this.router.navigate(['/lobby', roomId]);
+    })
+
+    this.socket.on('lobbyJoined',(roomId: string) => {
+      this.router.navigate(['/lobby', roomId]);
+    })
+
+
 
     this.socket.on('error', (message: string) => {
       console.error('Socket-Error:', message);

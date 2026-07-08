@@ -1,5 +1,12 @@
 <div class="dashboard-container">
 
+  @if (toastMessage) {
+    <div class="toast-error" (click)="dismissToast()">
+      <span class="toast-icon">⚠️</span>
+      <span>{{ toastMessage }}</span>
+    </div>
+  }
+
   <!-- Top Navigation -->
   <header class="dash-header">
     <div class="header-brand">
@@ -72,7 +79,7 @@
         <div class="streak-icon">🔥</div>
         <div>
           <h3 class="streak-title">Tägliche Belohnung</h3>
-          <p class="streak-desc">Dein Streak steht bei 4 Tagen. Morgen gibt es Bonus-Credits!</p>
+          <p class="streak-desc">Morgen gibt es 1000 Bonus-Credits!</p>
         </div>
       </div>
     </section>
@@ -90,20 +97,24 @@
             <div class="lobby-info">
               <span class="lobby-status-dot" [class.active]="lobby.players < lobby.maxPlayers"></span>
               <div>
-                <h3>Lobby von {{ lobby.host }}</h3>
-                <p>Einsatz: {{ lobby.betAmount }} Credits</p>
+                <h3 class="lobby-name">Lobby von {{ lobby.host }}</h3>
+                <p class="lobby-host">Einsatz: {{ lobby.betAmount }} Credits</p>
               </div>
             </div>
 
             <div class="lobby-meta">
               <span class="player-count">👥 {{ lobby.players }}/{{ lobby.maxPlayers }}</span>
-              <button
-                [disabled]="lobby.players >= lobby.maxPlayers"
-                (click)="joinLobby(lobby.id)"
-                class="btn-join"
-              >
-                Beitreten
-              </button>
+              @if (lobby.host === username) {
+                <span class="own-lobby-tag">Deine Lobby</span>
+              } @else {
+                <button
+                  [disabled]="lobby.players >= lobby.maxPlayers"
+                  (click)="joinLobby(lobby.id)"
+                  class="btn-join"
+                >
+                  Beitreten
+                </button>
+              }
             </div>
           </div>
         } @empty {

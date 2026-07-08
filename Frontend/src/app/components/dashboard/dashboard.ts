@@ -31,6 +31,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   newLobbyBetAmount: number = 100;
   createLobbyError: string = '';
 
+  toastMessage: string = '';
+  private toastTimeout: any;
+
   private sub = new Subscription();
 
   constructor(
@@ -54,11 +57,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.lobbies = lobbies;
       })
     );
+
+    this.sub.add(
+      this.socketService.error$.subscribe(message => {
+        this.createLobbyError = message; // weiterhin im Modal anzeigen, falls offen
+        this.showToast(message);
+      })
+    );
+
     this.socketService.requestLobbies()
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+  }
+
+  private showToast(message: string): void {
+    this.toastMessage = message;
+    clearTimeout(this.toastTimeout);
+    this.toastTimeout = setTimeout(() => {
+      this.toastMessage = '';
+    }, 4000);
+  }
+
+  dismissToast(): void {
+    this.toastMessage = '';
+    clearTimeout(this.toastTimeout);
   }
 
 

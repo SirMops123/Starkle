@@ -60,6 +60,12 @@ function getLobbySummaries(games: Record<string, Game>) {
             betAmount: g.betAmount,
             status: g.status
         }));
+
+    function isUserInActiveLobby(username: string, games: Record<string, Game>): boolean {
+        return Object.values(games).some(
+            g => (g.status === 'waiting' || g.status === 'playing') && g.playerNames.includes(username)
+        );
+    }
 }
 
 export default (io: Server, socket: Socket, activeGames: Record<string, Game>) => {
@@ -78,6 +84,11 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
         const username = (socket as any).username
         if (!username) {
             socket.emit('error', 'Please log in !')
+            return;
+        }
+
+        if (isUserInActiveLobby(username, activeGames)) {
+            socket.emit('error', 'Du bist bereits in einer Lobby!');
             return;
         }
 
@@ -129,23 +140,32 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
     });
 
 
-
     socket.on('joinLobby', async (roomId: string) => {
         const game = activeGames[roomId];
         const username = (socket as any).username
-        if(!game || !username || game.status !== 'waiting' || game.players.length >= game.maxPlayers) {
+        if (!game || !username || game.status !== 'waiting' || game.players.length >= game.maxPlayers) {
             socket.emit('error', 'Not possible to join Lobby!')
             return;
         }
 
-        try{
+        if (game.players.includes(socket.id) || game.playerNames.includes(username)) {
+            socket.emit('error', 'Du bist bereits in dieser Lobby!');
+            return;
+        }
+
+        if (isUserInActiveLobby(username, activeGames)) {
+            socket.emit('error', 'Du bist bereits in einer Lobby!');
+            return;
+        }
+
+        try {
             const user = await userRepository.findByUsername(username);
             if (!user || user.credits < game.betAmount) {
                 socket.emit('error', 'Not enough Credits!')
                 return;
             }
 
-            await userRepository.deductCredits(username,game.betAmount);
+            await userRepository.deductCredits(username, game.betAmount);
             game.totalPot += game.betAmount;
 
             game.players.push(socket.id);
@@ -153,15 +173,16 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
             game.gameState.playerScores[socket.id] = 0;
             socket.join(roomId);
 
-            if(game.players.length === game.maxPlayers) {
+            if (game.players.length === game.maxPlayers) {
                 game.status = 'playing';
                 //Todo maybe random
                 game.gameState.activePlayerId = game.players[0];
             }
-
+            socket.emit('lobbyJoined', roomId);
             io.to(roomId).emit('roomUpdate', game);
             io.emit('lobbiesUpdate', getLobbySummaries(activeGames));
-        }catch(err){
+            socket.emit('creditsUpdate', { credits: user.credits - game.betAmount });
+        } catch (err) {
             console.log(err);
             socket.emit('error', 'Failed to join Lobby!')
         }
@@ -194,7 +215,7 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
 
                 const updatedUser = await userRepository.findByUsername(username);
                 if (updatedUser) {
-                    socket.emit('loginSuccess', { username, credits: updatedUser.credits, bonusGiven: false });
+                    socket.emit('creditsUpdate', { credits: updatedUser.credits });
                 }
             } catch (err) {
                 console.error(err);
@@ -233,13 +254,13 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
         }
     });
 
-    socket.on('rollDice',(roomId: string) => {
+    socket.on('rollDice', (roomId: string) => {
         const game = activeGames[roomId];
         if (!game || game.status !== 'playing' || socket.id !== game.gameState.activePlayerId) return;
 
         const amountToRoll = game.gameState.currentTurn.diceLeftToRoll;
         game.gameState.currentTurn.activeDice = Array.from(
-            { length: amountToRoll },
+            {length: amountToRoll},
             () => Math.floor(Math.random() * 6) + 1
         );
 
@@ -252,12 +273,12 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
 
         const percentages = getPayoutPercentages(game.playerNames.length)
 
-        try{
-            const updatePromises = game.finalPlacements.map((username,index) => {
+        try {
+            const updatePromises = game.finalPlacements.map((username, index) => {
                 const share = percentages[index] || 0;
                 const reward = Math.round(game.totalPot * share)
-                if(reward > 0){
-                    return userRepository.addCredits(username,reward);
+                if (reward > 0) {
+                    return userRepository.addCredits(username, reward);
                 }
                 return Promise.resolve();
             });
@@ -266,8 +287,8 @@ export default (io: Server, socket: Socket, activeGames: Record<string, Game>) =
             game.status = 'finished';
 
             const allUsers = await userRepository.getAll();
-            io.to(roomId).emit('gameFinished', {game,user: allUsers});
-        }catch(err){
+            io.to(roomId).emit('gameFinished', {game, user: allUsers});
+        } catch (err) {
             console.log(err);
         }
     })
