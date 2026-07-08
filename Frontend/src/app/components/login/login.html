@@ -1,0 +1,42 @@
+<div class="login-container">
+  <div class="login-card">
+
+    <div class="login-header">
+      <div class="logo-wrapper">
+        <span class="logo-emoji">🎲</span>
+      </div>
+      <h1 class="login-title">
+        Willkommen bei <span class="brand-name">Starkle</span>
+      </h1>
+      <p class="login-subtitle">
+        Logge dich ein, um deine täglichen Credits zu sichern und Lobbies beizutreten.
+      </p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
+      <div class="form-group">
+        <label for="username" class="form-label">Dein Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="username"
+          required
+          minlength="3"
+          maxlength="20"
+          placeholder="z.B. WürfelMeister"
+          class="form-input"
+        />
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="!username.trim() || username.length < 3"
+        class="btn-submit"
+      >
+        In die Gaming-Zone einloggen
+      </button>
+    </form>
+
+  </div>
+</div>
