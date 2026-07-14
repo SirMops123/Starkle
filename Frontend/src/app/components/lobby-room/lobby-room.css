@@ -1,0 +1,208 @@
+@tailwind utilities;
+
+.room-container {
+  @apply min-h-screen bg-slate-950 text-white font-sans max-w-3xl mx-auto p-6 flex flex-col gap-6;
+}
+
+/* Header */
+.room-header {
+  @apply flex items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl px-6 py-5 shadow-xl;
+}
+
+.room-header h1 {
+  @apply text-xl font-bold tracking-tight;
+}
+
+.room-status {
+  @apply text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 border border-slate-700;
+}
+
+.room-status.playing {
+  @apply bg-emerald-500/10 text-emerald-400 border-emerald-500/20;
+}
+
+/* Info Bar */
+.room-info {
+  @apply flex flex-wrap gap-4 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 shadow-md;
+}
+
+.room-info p {
+  @apply text-sm text-slate-300 font-medium;
+}
+
+/* Player List */
+.player-list {
+  @apply bg-slate-900 border border-slate-800 rounded-2xl divide-y divide-slate-800 shadow-xl overflow-hidden;
+}
+
+.player-list li {
+  @apply flex items-center justify-between px-6 py-4 text-sm font-medium text-slate-200;
+}
+
+.host-tag {
+  @apply text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20;
+}
+
+/* Actions */
+.btn-leave {
+  @apply w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-semibold rounded-xl transition-all cursor-pointer;
+}
+
+.playing-placeholder {
+  @apply text-center text-slate-500 text-sm py-10 bg-slate-900 border border-dashed border-slate-800 rounded-2xl;
+}
+
+/* Scoreboard */
+.scoreboard {
+  @apply bg-slate-900 border border-slate-800 rounded-2xl divide-y divide-slate-800 shadow-xl overflow-hidden;
+}
+
+.score-row {
+  @apply flex items-center justify-between px-5 py-4 text-sm;
+}
+
+.score-row.active-turn {
+  @apply bg-indigo-500/5 border-l-2 border-indigo-500;
+}
+
+.score-player {
+  @apply flex items-center gap-2 flex-wrap;
+}
+
+.score-name {
+  @apply font-semibold text-slate-100;
+}
+
+.turn-indicator {
+  @apply text-xs text-indigo-400;
+}
+
+.racing-tag {
+  @apply text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20;
+}
+
+.score-value {
+  @apply flex items-center gap-2 font-bold text-slate-200;
+}
+
+.placement-badge {
+  @apply text-xs px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+}
+
+/* Dice area */
+.dice-area {
+  @apply bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-4;
+}
+
+.dice-row {
+  @apply flex flex-wrap gap-3 justify-center min-h-[64px];
+}
+
+.die {
+  @apply w-14 h-14 min-w-[44px] min-h-[44px] rounded-xl bg-slate-800 border border-slate-700 text-xl font-bold text-white flex items-center justify-center transition-all cursor-pointer hover:border-slate-500 disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.die.selected {
+  @apply bg-indigo-600 border-indigo-400 shadow-lg shadow-indigo-600/30;
+}
+
+.die.from-pool {
+  @apply ring-2 ring-amber-500/40;
+}
+
+.dice-hint {
+  @apply text-slate-500 text-sm text-center w-full;
+}
+
+.selection-preview {
+  @apply text-center text-sm font-semibold text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2;
+}
+
+.selection-preview.valid {
+  @apply text-emerald-400 bg-emerald-500/10 border-emerald-500/20;
+}
+
+.pending-groups {
+  @apply flex flex-wrap gap-2 items-center;
+}
+
+.pending-group-chip {
+  @apply text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 cursor-pointer hover:bg-slate-700;
+}
+
+.pending-total {
+  @apply text-sm font-semibold text-amber-400 ml-2;
+}
+
+.dice-actions {
+  @apply flex flex-wrap gap-3;
+}
+
+.btn-roll, .btn-bank, .btn-add-group, .btn-confirm-dice {
+  @apply flex-1 min-w-[120px] py-3 rounded-xl font-semibold text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
+.btn-roll {
+  @apply bg-indigo-600 hover:bg-indigo-500 text-white;
+}
+
+.btn-bank {
+  @apply bg-emerald-600 hover:bg-emerald-500 text-white;
+}
+
+.btn-add-group {
+  @apply bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700;
+}
+
+.btn-confirm-dice {
+  @apply bg-amber-600 hover:bg-amber-500 text-white;
+}
+
+.turn-banked {
+  @apply text-center text-sm text-slate-400;
+}
+
+/* Finished */
+.finished-banner {
+  @apply bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center flex flex-col gap-4 shadow-xl;
+}
+
+.placements-list {
+  @apply list-decimal list-inside text-left mx-auto text-slate-200 font-medium space-y-1;
+}
+
+.btn-leave-warning {
+  @apply mt-2 opacity-70 hover:opacity-100;
+}
+
+.busted-banner {
+  @apply flex flex-col items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl p-4 animate-toast-in;
+}
+
+.busted-label {
+  @apply text-sm font-bold text-red-400;
+}
+
+.busted-dice-row {
+  @apply flex flex-wrap gap-2 justify-center;
+}
+
+.busted-die {
+  @apply w-12 h-12 rounded-xl bg-red-900/40 border border-red-500/30 text-white font-bold flex items-center justify-center opacity-80;
+}
+
+.locked-groups {
+  @apply flex flex-wrap gap-2;
+}
+
+.locked-group-chip {
+  @apply flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 cursor-pointer hover:bg-emerald-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.unlock-icon {
+  @apply text-xs opacity-70;
+}
+
+.die.from-unlocked {
+  @apply ring-2 ring-amber-500/40;
+}

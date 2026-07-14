@@ -1,5 +1,0 @@
-CREATE TABLE IF NOT EXISTS users (
-    username VARCHAR(50) PRIMARY KEY,
-    credits INT DEFAULT 1000,
-    last_login DATE DEFAULT CURRENT_DATE
-    );

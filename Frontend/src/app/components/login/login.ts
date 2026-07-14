@@ -1,10 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {SocketService} from '../../services/socket.service';
-import {Router} from '@angular/router';
-import {UserService} from '../../services/user.service';
-import {Subscription} from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { SocketService } from '../../services/socket.service';
+import { UserService } from '../../services/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -15,42 +15,47 @@ import {Subscription} from 'rxjs';
 })
 export class LoginComponent implements OnInit, OnDestroy {
   username: string = '';
-  errorMessage:string = '';
+  password: string = '';
+  errorMessage: string = '';
 
   private subs = new Subscription();
 
-  constructor(private socketService: SocketService,
-              private router: Router,
-              private userService: UserService,) {
-  }
+  constructor(
+    private socketService: SocketService,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.subs.add(
       this.userService.currentUser$.subscribe(user => {
-        if(user) {
-          this.router.navigate(['/dashboard']);
-        }
+        if (user) this.router.navigate(['/dashboard']);
       })
     );
+
     this.subs.add(
       this.socketService.error$.subscribe(message => {
         this.errorMessage = message;
       })
-    )
+    );
   }
 
-  ngOnDestroy(): void  {
+  ngOnDestroy(): void {
     this.subs.unsubscribe();
   }
 
   onSubmit(): void {
     const cleanName = this.username.trim();
     if (cleanName.length < 3) {
-      this.errorMessage = 'a valid username has 3 or more chars';
+      this.errorMessage = 'Username must be at least 3 characters';
       return;
     }
-    this.errorMessage = '';
-    this.socketService.login(cleanName)
-  }
+    if (this.password.length < 4) {
+      this.errorMessage = 'Password must be at least 4 characters';
+      return;
+    }
 
+    this.errorMessage = '';
+    this.socketService.login(cleanName, this.password);
+  }
 }

@@ -1,0 +1,154 @@
+<div class="room-container">
+
+  @if (toastMessage) {
+    <div class="toast-error" (click)="dismissToast()">
+      <span class="toast-icon">⚠️</span>
+      <span>{{ toastMessage }}</span>
+    </div>
+  }
+
+  @if (game) {
+    <header class="room-header">
+      <h1>Lobby {{ roomId }}</h1>
+      <div class="header-right">
+        <span class="credits-badge">🪙 {{ credits }} Credits</span>
+        <span class="room-status" [class.playing]="game.status === 'playing'">
+          {{ game.status === 'waiting' ? 'Waiting for players' : game.status === 'playing' ? 'In progress' : 'Finished' }}
+        </span>
+      </div>
+    </header>
+
+    <div class="room-info">
+      <p>Bet: {{ game.betAmount }} Credits</p>
+      <p>Pot: {{ game.totalPot }} Credits</p>
+      <p>Players: {{ game.players.length }}/{{ game.maxPlayers }}</p>
+      <p>Target Score: {{ game.targetScore }}</p>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+      @for (id of game.players; track id; let i = $index) {
+        <div class="score-row" [class.active-turn]="id === game.gameState.activePlayerId">
+          <div class="score-player">
+            <span class="score-name">{{ game.playerNames[i] }}</span>
+            @if (id === game.gameState.activePlayerId) {
+              <span class="turn-indicator">🎲 rolling</span>
+            }
+            @if (isRacing(id)) {
+              <span class="racing-tag">racing to finish</span>
+            }
+          </div>
+          <div class="score-value">
+            @if (placementFor(id)) {
+              <span class="placement-badge">#{{ placementFor(id) }}</span>
+            }
+            {{ scoreFor(id) }} pts
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (game.status === 'waiting') {
+      <button (click)="leaveLobby()" class="btn-leave">Leave Lobby</button>
+    }
+
+    @if (game.status === 'playing') {
+
+      <button (click)="leaveLobby()" class="btn-leave btn-leave-warning">
+        Forfeit &amp; Leave
+      </button>
+    }
+
+    @if (game.status === 'playing') {
+
+      <!-- Würfel-Bereich -->
+      <div class="dice-area">
+
+        @if (showBusted) {
+          <div class="busted-banner">
+            <span class="busted-label">💥 {{ bustedPlayerName }} busted — lost this turn's points!</span>
+            <div class="busted-dice-row">
+              @for (val of bustedRoll; track $index) {
+                <div class="die busted-die">{{ val }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (lockedGroups.length > 0) {
+          <div class="locked-groups">
+            @for (group of lockedGroups; track $index; let i = $index) {
+              <button class="locked-group-chip" (click)="unlockGroup(i)" [disabled]="!isMyTurn()">
+                {{ group.join(', ') }} — {{ scoreGroupPoints(group) }} pts
+                <span class="unlock-icon">🔓</span>
+              </button>
+            }
+          </div>
+        }
+
+        <div class="dice-row">
+          @for (die of availableDice; track die.key) {
+            <button
+              class="die"
+              [class.selected]="selectedKeys.has(die.key)"
+              [class.from-unlocked]="die.source === 'unlocked'"
+              (click)="toggleDie(die)"
+              [disabled]="!isMyTurn()"
+            >
+              {{ die.value }}
+            </button>
+          }
+          @if (availableDice.length === 0 && lockedGroups.length === 0) {
+            <p class="dice-hint">No dice yet — roll to start your turn.</p>
+          }
+        </div>
+
+        @if (selectedValues.length > 0) {
+          <div class="selection-preview" [class.valid]="selectionPreview.valid">
+            @if (selectionPreview.valid) {
+              Selection worth {{ selectionPreview.points }} points
+            } @else {
+              {{ selectionPreview.reason }}
+            }
+          </div>
+        }
+
+        <div class="dice-actions">
+          <button class="btn-add-group" [disabled]="!selectionPreview.valid" (click)="addGroup()">
+            Add Group
+          </button>
+          <button class="btn-confirm-dice" [disabled]="!canConfirmDice" (click)="confirmDice()">
+            Confirm Dice
+          </button>
+          <button class="btn-roll" [disabled]="!isMyTurn() || !canRoll" (click)="rollDice()">
+            Roll Dice
+          </button>
+          <button class="btn-bank" [disabled]="!isMyTurn() || !canBank" (click)="bankScore()">
+            Bank Score
+          </button>
+        </div>
+
+        @if (game!.gameState.currentTurn.bankedThisTurn > 0) {
+          <p class="turn-banked">
+            Banked so far this turn: {{ game!.gameState.currentTurn.bankedThisTurn }} pts
+          </p>
+        }
+      </div>
+    }
+
+    @if (game.status === 'finished') {
+      <div class="finished-banner">
+        <h2>Game Over</h2>
+        <ol class="placements-list">
+          @for (name of game.finalPlacements; track name) {
+            <li>{{ name }}</li>
+          }
+        </ol>
+        <button (click)="leaveLobby()" class="btn-leave">Back to Dashboard</button>
+      </div>
+    }
+
+  } @else {
+    <p>Loading lobby data...</p>
+  }
+</div>

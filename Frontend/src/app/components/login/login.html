@@ -1,42 +1,44 @@
 <div class="login-container">
   <div class="login-card">
-
-    <div class="login-header">
-      <div class="logo-wrapper">
-        <span class="logo-emoji">🎲</span>
-      </div>
-      <h1 class="login-title">
-        Willkommen bei <span class="brand-name">Starkle</span>
-      </h1>
-      <p class="login-subtitle">
-        Logge dich ein, um deine täglichen Credits zu sichern und Lobbies beizutreten.
-      </p>
+    <div class="login-brand">
+      <span class="brand-logo">🎲</span>
+      <h1 class="brand-text">Starkle <span class="badge-beta">Beta</span></h1>
     </div>
 
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
-      <div class="form-group">
-        <label for="username" class="form-label">Dein Username</label>
+    <p class="login-subtitle">Enter a username and password — new accounts are created automatically.</p>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="field-group">
+        <label for="username">Username</label>
         <input
-          type="text"
           id="username"
-          name="username"
+          type="text"
           [(ngModel)]="username"
-          required
-          minlength="3"
-          maxlength="20"
-          placeholder="z.B. WürfelMeister"
-          class="form-input"
+          name="username"
+          autocomplete="username"
+          placeholder="e.g. DiceMaster"
         />
       </div>
 
-      <button
-        type="submit"
-        [disabled]="!username.trim() || username.length < 3"
-        class="btn-submit"
-      >
-        In die Gaming-Zone einloggen
+      <div class="field-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          autocomplete="current-password"
+          placeholder="••••••••"
+        />
+      </div>
+
+      @if (errorMessage) {
+        <p class="error">{{ errorMessage }}</p>
+      }
+
+      <button type="submit" class="btn-login">
+        Login / Register
       </button>
     </form>
-
   </div>
 </div>

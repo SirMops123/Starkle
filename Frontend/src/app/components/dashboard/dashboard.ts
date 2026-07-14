@@ -29,6 +29,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showCreateLobbyModal: boolean = false;
   newLobbyMaxPlayers: number = 4;
   newLobbyBetAmount: number = 100;
+  newLobbyTargetScore: number = 5000;
+
   createLobbyError: string = '';
 
   toastMessage: string = '';
@@ -89,6 +91,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   openCreateLobbyModal(): void {
     this.newLobbyMaxPlayers = 4;
     this.newLobbyBetAmount = 100;
+    this.newLobbyTargetScore = 5000; // NEU
     this.createLobbyError = '';
     this.showCreateLobbyModal = true;
   }
@@ -99,22 +102,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   confirmCreateLobby(): void {
     if (this.newLobbyMaxPlayers < 2 || this.newLobbyMaxPlayers > 8) {
-      this.createLobbyError = 'Spieleranzahl muss zwischen 2 und 8 liegen';
+      this.createLobbyError = 'Player count must be between 2 and 8';
       return;
     }
     if (this.newLobbyBetAmount < 0) {
-      this.createLobbyError = 'Einsatz darf nicht negativ sein';
+      this.createLobbyError = 'Bet amount cannot be negative';
       return;
     }
     if (this.newLobbyBetAmount > this.credits) {
-      this.createLobbyError = 'Nicht genug Credits für diesen Einsatz';
+      this.createLobbyError = 'Not enough credits for this bet';
+      return;
+    }
+    if (this.newLobbyTargetScore < 500 || this.newLobbyTargetScore > 100000) {
+      this.createLobbyError = 'Target score must be between 500 and 100000';
       return;
     }
 
     this.createLobbyError = '';
-    this.socketService.createLobby(this.newLobbyMaxPlayers, this.newLobbyBetAmount);
+    this.socketService.createLobby(this.newLobbyMaxPlayers, this.newLobbyBetAmount, this.newLobbyTargetScore);
     this.showCreateLobbyModal = false;
   }
+
 
   joinLobby(lobbyId: string): void {
     this.socketService.joinLobby(lobbyId)

@@ -62,6 +62,16 @@
                 step="10"
               />
 
+              <label for="targetScore">Target Score</label>
+              <input
+                id="targetScore"
+                type="number"
+                [(ngModel)]="newLobbyTargetScore"
+                min="500"
+                max="100000"
+                step="500"
+              />
+
               @if (createLobbyError) {
                 <p class="error">{{ createLobbyError }}</p>
               }

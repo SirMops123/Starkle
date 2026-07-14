@@ -14,12 +14,10 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
-  const cachedUsername = sessionStorage.getItem('username');
-  if (!cachedUsername) {
+  const attempted = socketService.resumeSession();
+  if (!attempted) {
     return router.createUrlTree(['/login']);
   }
-
-  socketService.login(cachedUsername);
 
   return userService.currentUser$.pipe(
     switchMap(user => {
